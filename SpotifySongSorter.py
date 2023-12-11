@@ -23,17 +23,16 @@ def fetch_users_liked_songs(sp):
         tracks.extend(results['items'])
     return [track['track']['id'] for track in tracks]
 
-def filter_instrumental_tracks(sp, track_ids):
-    instrumental_tracks = []
+def filter_running_tracks(sp, track_ids, tempo_threshold=150):
+    running_tracks = []
     # Process in batches of 100 tracks
     for i in range(0, len(track_ids), 100):
         batch = track_ids[i:i + 100]
         features_list = sp.audio_features(batch)
         for features in features_list:
-            if features and features['instrumentalness'] > 0.5:
-                instrumental_tracks.append(features['id'])
-    return instrumental_tracks
-
+            if features and features['tempo'] > tempo_threshold:
+                running_tracks.append(features['id'])
+    return running_tracks
 
 def create_playlist(sp, name):
     user_id = sp.current_user()["id"]
@@ -46,14 +45,13 @@ def add_tracks_to_playlist(sp, playlist_id, track_ids):
         batch = track_ids[i:i + 100]
         sp.playlist_add_items(playlist_id, batch)
 
-
 def main():
     sp = authenticate_spotify()
     liked_songs = fetch_users_liked_songs(sp)
-    instrumental_tracks = filter_instrumental_tracks(sp, liked_songs)
+    running_tracks = filter_running_tracks(sp, liked_songs)
 
-    playlist_id = create_playlist(sp, 'Instrumental Liked Songs')
-    add_tracks_to_playlist(sp, playlist_id, instrumental_tracks)
+    playlist_id = create_playlist(sp, 'Running Playlist')
+    add_tracks_to_playlist(sp, playlist_id, running_tracks)
 
 if __name__ == '__main__':
     main()
