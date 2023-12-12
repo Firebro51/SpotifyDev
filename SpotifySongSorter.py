@@ -15,25 +15,10 @@ def authenticate_spotify():
     )
     return spotipy.Spotify(auth_manager=auth_manager)
 
-def fetch_users_liked_songs(sp):
-    results = sp.current_user_saved_tracks()
-    tracks = results['items']
-    while results['next']:
-        results = sp.next(results)
-        tracks.extend(results['items'])
-    return [track['track']['id'] for track in tracks]
-
-def filter_instrumental_tracks(sp, track_ids):
-    instrumental_tracks = []
-    # Process in batches of 100 tracks
-    for i in range(0, len(track_ids), 100):
-        batch = track_ids[i:i + 100]
-        features_list = sp.audio_features(batch)
-        for features in features_list:
-            if features and features['instrumentalness'] > 0.5:
-                instrumental_tracks.append(features['id'])
-    return instrumental_tracks
-
+def search_tracks(sp, keyword):
+    results = sp.search(q=keyword, limit=50, type='track')
+    tracks = results['tracks']['items']
+    return [track['id'] for track in tracks]
 
 def create_playlist(sp, name):
     user_id = sp.current_user()["id"]
@@ -46,14 +31,13 @@ def add_tracks_to_playlist(sp, playlist_id, track_ids):
         batch = track_ids[i:i + 100]
         sp.playlist_add_items(playlist_id, batch)
 
-
-def main():
+def main(keyword):
     sp = authenticate_spotify()
-    liked_songs = fetch_users_liked_songs(sp)
-    instrumental_tracks = filter_instrumental_tracks(sp, liked_songs)
+    track_ids = search_tracks(sp, keyword)
 
-    playlist_id = create_playlist(sp, 'Instrumental Liked Songs')
-    add_tracks_to_playlist(sp, playlist_id, instrumental_tracks)
+    playlist_id = create_playlist(sp, f'{keyword} Playlist')
+    add_tracks_to_playlist(sp, playlist_id, track_ids)
 
 if __name__ == '__main__':
-    main()
+    keyword = "Love"  # keyword for song
+    main(keyword)
