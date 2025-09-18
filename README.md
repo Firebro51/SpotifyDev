@@ -14,7 +14,8 @@ Automatically generates themed playlists from your Spotify liked songs using aud
 Fetches all your Spotify liked songs and retrieves their audio features through the Spotify API. Each track gets analyzed for characteristics like energy level, danceability, valence (positivity), tempo, and instrumentalness. Based on your configured filtering criteria, matching tracks are automatically added to a new themed playlist in your account.
 
 <img width="4743" height="2692" alt="Generated Running Playlist" src="https://github.com/user-attachments/assets/434da9d1-9cf2-4dae-9fc7-9790d4a05a4e" />
-<sub>*Example: 148-song running playlist automatically generated from liked songs library*</sub>
+<sub><i>Example: 148-song running playlist automatically generated from liked songs library</i></sub>
+
 
 ## Customization
 
